@@ -48,6 +48,7 @@ impl<T: PrimitiveVectorElement, S: UniversalRead> VectorStorageRead
         self.get_vector_opt::<P>(key).expect("vector not found")
     }
 
+    // TODO: Dedup with `AppendableMmapMultiDenseVectorStorage::iter_vectors`
     fn read_vectors<P: AccessPattern, U: Copy>(
         &self,
         keys: impl IntoIterator<Item = (U, PointOffsetType)>,

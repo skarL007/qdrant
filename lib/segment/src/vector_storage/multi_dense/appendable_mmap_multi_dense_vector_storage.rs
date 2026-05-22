@@ -153,6 +153,7 @@ impl<T: PrimitiveVectorElement> AppendableMmapMultiDenseVectorStorage<T> {
         Ok(())
     }
 
+    // TODO: Dedup with `ReadOnlyChunkedMultiDenseVectorStorage::read_vectors`
     fn iter_vectors<P: AccessPattern, U>(
         &self,
         keys: impl IntoIterator<Item = (U, PointOffsetType)>,
@@ -213,6 +214,8 @@ impl<T: PrimitiveVectorElement> MultiVectorStorage<T> for AppendableMmapMultiDen
     }
 
     fn iterate_inner_vectors(&self) -> impl Iterator<Item = Cow<'_, [T]>> + Clone + Send {
+        // TODO: Implement based on `iter_vectors`!?
+
         (0..self.total_vector_count()).flat_map(move |key| {
             let mmap_offset = self
                 .offsets
