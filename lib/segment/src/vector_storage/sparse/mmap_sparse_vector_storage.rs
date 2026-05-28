@@ -254,7 +254,7 @@ impl VectorStorageRead for MmapSparseVectorStorage {
     ) {
         let callback = |user_data, point_offset, sparse_vector| -> OperationResult<()> {
             let Some(sparse_vector) = sparse_vector else {
-                todo!()
+                return Ok(());
             };
 
             let sparse_vector = SparseVector::try_from(sparse_vector)?;
