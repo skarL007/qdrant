@@ -77,7 +77,7 @@ where
                 &query_cardinality,
                 hw_counter,
                 is_stopped,
-                DeferredBehavior::Exclude,
+                DeferredBehavior::VisibleOnly,
             )?
             .collect();
         Ok(result)

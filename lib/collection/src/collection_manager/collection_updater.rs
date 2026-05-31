@@ -223,7 +223,7 @@ mod tests {
             TEST_TIMEOUT,
             &is_stopped,
             HwMeasurementAcc::new(),
-            DeferredBehavior::Exclude,
+            DeferredBehavior::VisibleOnly,
         )
         .unwrap()
         .into_values()
@@ -262,7 +262,7 @@ mod tests {
             TEST_TIMEOUT,
             &is_stopped,
             HwMeasurementAcc::new(),
-            DeferredBehavior::Exclude,
+            DeferredBehavior::VisibleOnly,
         )
         .unwrap()
         .into_values()
@@ -306,7 +306,7 @@ mod tests {
             TEST_TIMEOUT,
             &is_stopped,
             HwMeasurementAcc::new(),
-            DeferredBehavior::Exclude,
+            DeferredBehavior::VisibleOnly,
         )
         .unwrap()
         .into_values()
@@ -345,7 +345,7 @@ mod tests {
             TEST_TIMEOUT,
             &is_stopped,
             HwMeasurementAcc::new(),
-            DeferredBehavior::Exclude,
+            DeferredBehavior::VisibleOnly,
         )
         .unwrap()
         .into_values()
@@ -364,7 +364,7 @@ mod tests {
             TEST_TIMEOUT,
             &is_stopped,
             HwMeasurementAcc::new(),
-            DeferredBehavior::Exclude,
+            DeferredBehavior::VisibleOnly,
         )
         .unwrap()
         .into_values()
@@ -390,7 +390,7 @@ mod tests {
             TEST_TIMEOUT,
             &is_stopped,
             HwMeasurementAcc::new(),
-            DeferredBehavior::Exclude,
+            DeferredBehavior::VisibleOnly,
         )
         .unwrap()
         .into_values()
@@ -463,7 +463,7 @@ mod tests {
             TEST_TIMEOUT,
             &is_stopped,
             HwMeasurementAcc::new(),
-            DeferredBehavior::Exclude,
+            DeferredBehavior::VisibleOnly,
         )
         .unwrap()
         .into_values()
@@ -527,7 +527,7 @@ mod tests {
             TEST_TIMEOUT,
             &is_stopped,
             HwMeasurementAcc::new(),
-            DeferredBehavior::Exclude,
+            DeferredBehavior::VisibleOnly,
         )
         .unwrap()
         .into_values()
