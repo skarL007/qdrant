@@ -46,7 +46,7 @@ impl<S: UniversalRead> PayloadStorageRead for ReadOnlyPayloadStorage<S> {
     fn read_payloads<P: AccessPattern, U>(
         &self,
         point_offsets: impl Iterator<Item = (U, PointOffsetType)>,
-        mut callback: impl FnMut(U, Payload),
+        mut callback: impl FnMut(U, Payload) -> OperationResult<()>,
         _hw_counter: &HardwareCounterCell,
     ) -> OperationResult<()> {
         // TODO: `hw_counter`!?
@@ -57,8 +57,7 @@ impl<S: UniversalRead> PayloadStorageRead for ReadOnlyPayloadStorage<S> {
                     return Ok(());
                 };
 
-                callback(user_data, payload);
-                Ok(())
+                callback(user_data, payload)
             })
     }
 
