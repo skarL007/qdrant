@@ -53,10 +53,7 @@ impl<S: UniversalRead> PayloadStorageRead for ReadOnlyPayloadStorage<S> {
 
         self.storage
             .read_values::<P, _, _>(point_offsets, |user_data, _, payload| {
-                let Some(payload) = payload else {
-                    return Ok(());
-                };
-
+                let payload = payload.unwrap_or_default();
                 callback(user_data, payload)
             })
     }
