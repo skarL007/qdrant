@@ -84,6 +84,7 @@ pub struct WalConfigDiff {
     /// Number of WAL segments to create ahead of actually used ones
     pub wal_segments_ahead: Option<usize>,
     /// Number of closed WAL segments to retain
+    #[validate(range(min = 1))]
     pub wal_retain_closed: Option<usize>,
 }
 
@@ -608,5 +609,15 @@ mod tests {
         let update: WalConfigDiff = serde_json::from_str(r#"{ "wal_segments_ahead": 2 }"#).unwrap();
         let new_config = base_config.update(&update);
         assert_eq!(new_config.wal_segments_ahead, 2)
+    }
+
+    #[test]
+    fn test_wal_retain_closed_zero_is_rejected() {
+        let diff = WalConfigDiff {
+            wal_capacity_mb: None,
+            wal_segments_ahead: None,
+            wal_retain_closed: Some(0),
+        };
+        assert!(diff.validate().is_err());
     }
 }
