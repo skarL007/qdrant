@@ -235,7 +235,7 @@ impl Collection {
                 using: using.clone(),
                 filter: Some(filter.clone()),
                 score_threshold: None,
-                limit: limit_per_sample + 1, // +1 to exclude the point itself afterward
+                limit: limit_per_sample.saturating_add(1), // +1 to exclude the point itself afterward
                 offset: 0,
                 params: None,
                 with_vector: WithVector::Bool(false),
@@ -271,7 +271,7 @@ impl Collection {
                 scores.remove(sample_pos);
             } else {
                 // if not found pop lowest score
-                if scores.len() == limit_per_sample + 1 {
+                if scores.len() == limit_per_sample.saturating_add(1) {
                     // if we have enough results, remove the last one
                     scores.pop();
                 }

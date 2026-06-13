@@ -152,7 +152,7 @@ impl QueryGroupRequest {
         let mut request = self.source.clone();
 
         // Adjust limit to fetch enough points to fill groups
-        request.limit = self.groups * self.group_size;
+        request.limit = self.groups.saturating_mul(self.group_size);
         request.prefetches.iter_mut().for_each(|prefetch| {
             increase_limit_for_group(prefetch, self.group_size);
         });

@@ -12,6 +12,15 @@ use serde_json::Value;
 use super::types::{AggregatorError, Group};
 
 type Hits = AHashMap<PointIdType, ScoredPoint>;
+
+/// Upper bound for pre-allocations driven by user-supplied group limits.
+///
+/// `groups` and `group_size` come straight from request limits and are only validated to
+/// be `>= 1` (no upper bound). Capping the reserved capacity avoids `groups * group_size`
+/// overflowing and avoids reserving an unbounded amount of memory (a capacity-overflow
+/// panic / OOM). Mirrors the bound used by the search result aggregators.
+const LARGEST_REASONABLE_ALLOCATION_SIZE: usize = 1_048_576;
+
 pub(super) struct GroupsAggregator {
     groups: AHashMap<GroupId, Hits>,
     max_group_size: usize,
@@ -30,14 +39,18 @@ impl GroupsAggregator {
         grouped_by: JsonPath,
         order: Option<Order>,
     ) -> Self {
+        let groups_capacity = groups.min(LARGEST_REASONABLE_ALLOCATION_SIZE);
+        let all_ids_capacity = groups
+            .saturating_mul(group_size)
+            .min(LARGEST_REASONABLE_ALLOCATION_SIZE);
         Self {
-            groups: AHashMap::with_capacity(groups),
+            groups: AHashMap::with_capacity(groups_capacity),
             max_group_size: group_size,
             grouped_by,
             max_groups: groups,
-            full_groups: AHashSet::with_capacity(groups),
-            group_best_scores: AHashMap::with_capacity(groups),
-            all_ids: AHashSet::with_capacity(groups * group_size),
+            full_groups: AHashSet::with_capacity(groups_capacity),
+            group_best_scores: AHashMap::with_capacity(groups_capacity),
+            all_ids: AHashSet::with_capacity(all_ids_capacity),
             order,
         }
     }
@@ -70,10 +83,9 @@ impl GroupsAggregator {
             .map_err(|_| AggregatorError::BadKeyType)?;
 
         for group_key in unique_group_keys {
-            let group = self
-                .groups
-                .entry(group_key.clone())
-                .or_insert_with(|| AHashMap::with_capacity(self.max_group_size));
+            let group = self.groups.entry(group_key.clone()).or_insert_with(|| {
+                AHashMap::with_capacity(self.max_group_size.min(LARGEST_REASONABLE_ALLOCATION_SIZE))
+            });
 
             let entry = group.entry(point.id);
 
@@ -229,6 +241,23 @@ mod unit_tests {
             shard_key: None,
             order_value: None,
         }
+    }
+
+    #[test]
+    fn test_new_with_extreme_limits_does_not_overflow() {
+        // `groups` and `group_size` are user-supplied limits validated only as `>= 1`.
+        // Before bounding the pre-allocations, `groups * group_size` overflowed (debug
+        // panic with overflow checks) and the resulting `with_capacity` reserved an
+        // unbounded amount of memory (capacity-overflow panic / OOM in release).
+        // Constructing the aggregator with extreme limits must not panic.
+        let aggregator = GroupsAggregator::new(
+            usize::MAX,
+            usize::MAX,
+            "docId".parse().unwrap(),
+            Some(Order::LargeBetter),
+        );
+        assert_eq!(aggregator.max_groups, usize::MAX);
+        assert_eq!(aggregator.max_group_size, usize::MAX);
     }
 
     #[test]
